@@ -1,17 +1,11 @@
 # app.py
-# Shark Exchange — PURE INSTITUTIONAL BIAS ENGINE (PHASE 2 - DEFINITIVE CORE)
+# Shark Exchange — PURE INSTITUTIONAL BIAS ENGINE (MANUAL BLUEPRINT)
 # Hosted live on Streamlit Community Cloud
 
 import streamlit as st
 import pandas as pd
 import numpy as np
-import requests
 import plotly.graph_objects as go
-from streamlit_autorefresh import st_autorefresh
-
-# ─── AUTO REFRESH LOOP ────────────────────────────────────────────────────
-# Tells the cloud server to ping the feed and reload elements every 3 seconds
-st_autorefresh(interval=3000, key="shark_live_refresh_node")
 
 # ─── PREMIUM INSTITUTIONAL DARK THEME CONFIG ──────────────────────────────
 st.set_page_config(page_title="Shark Institutional Bias Engine", page_icon="🦈", layout="wide")
@@ -39,33 +33,13 @@ div[data-testid="stMetricValue"] { font-size: 1.3rem; font-weight: bold; color: 
 """, unsafe_allow_html=True)
 
 st.title("🦈 SHARK EXCHANGE // INSTITUTIONAL BIAS ENGINE")
-st.caption("Phase 2 Production Node — Resilient Multi-Network Live Ticker Feeds.")
+st.caption("Phase 1 Unified Build — Zero-Latency Standalone Manual Analytics Panel.")
 st.markdown("---")
-
-# ─── HIGH-RELIABILITY PRICE FEED CONNECTOR ────────────────────────────────
-def fetch_resilient_live_price(symbol):
-    try:
-        # Pulls live numbers through public open metrics nodes to clear firewall limits
-        if symbol == "BTCUSDT":
-            url = "https://coingecko.com"
-            response = requests.get(url, timeout=3)
-            if response.status_code == 200:
-                return float(response.json()["bitcoin"]["usd"]), "LIVE FEED"
-        else:
-            url = "https://coingecko.com"
-            response = requests.get(url, timeout=3)
-            if response.status_code == 200:
-                gold_spot = float(response.json()["pax-gold"]["usd"])
-                return float(round(gold_spot, 2)), "LIVE FEED"
-    except Exception:
-        pass
-        
-    return (75636.00 if symbol == "BTCUSDT" else 2684.30), "LOCAL NODE SYNCING"
 
 # ─── SIDEBAR MANIPULATION MODULES ──────────────────────────────────────────
 st.sidebar.header("🔍 MARKET MATRIX SELECTION")
 selected_asset = st.sidebar.selectbox("Active Trading Pair", ["BTCUSDT", "XAUUSDT"])
-trading_profile = st.sidebar.radio("Active Operational Profile", ["INTRADAY", "SWING"])
+trading_profile = st.sidebar.sidebar_action = st.sidebar.radio("Active Operational Profile", ["INTRADAY", "SWING"])
 
 if trading_profile == "INTRADAY":
     exec_tf = "3m"
@@ -77,33 +51,36 @@ else:
     st.sidebar.info("🔱 Profile: SWING\nExecution Frame: 30m\nContext Filters: 1h | 4h | 12h | 1d")
 
 st.sidebar.markdown("---")
-st.sidebar.header("✍️ BIAS ANALYSIS CONTROLS")
-st.sidebar.caption("Input your manual SMC metrics below:")
+st.sidebar.header("✍️ BIAS CONTROLS")
 
-# Stream prices cleanly from open nodes
-live_mark, feed_origin = fetch_resilient_live_price(selected_asset)
-
-# Dynamic Liquidity Targets adjusted around live calculations
-input_liq_high = st.sidebar.number_input("Institutional Liquidity Top ($)", value=float(round(live_mark * 1.002, 2)), step=0.1)
-input_liq_low = st.sidebar.number_input("Institutional Liquidity Base ($)", value=float(round(live_mark * 0.998, 2)), step=0.1)
-input_buyer_pct = st.sidebar.slider("Buyer Sentiment Ratio (%)", min_value=0, max_value=100, value=55)
-input_vol_delta = st.sidebar.number_input("Net Volume Delta (Contracts)", value=3450, step=10)
+# Form wrapper forces the application to evaluate inputs simultaneously on button click
+with st.sidebar.form(key="smc_input_form"):
+    st.caption("Type in numbers directly from your trading terminal screen:")
+    
+    input_mark_price = st.number_input("Current Mark Price ($)", value=75636.00 if selected_asset == "BTCUSDT" else 2684.30, step=1.0)
+    input_liq_high = st.number_input("Institutional Liquidity Top ($)", value=75850.00 if selected_asset == "BTCUSDT" else 2695.00, step=1.0)
+    input_liq_low = st.number_input("Institutional Liquidity Base ($)", value=75450.00 if selected_asset == "BTCUSDT" else 2670.00, step=1.0)
+    input_buyer_pct = st.slider("Buyer Sentiment Ratio (%)", min_value=0, max_value=100, value=55)
+    input_vol_delta = st.number_input("Net Volume Delta (Contracts)", value=3450, step=10)
+    
+    # Form submission anchor button
+    submit_button = st.form_submit_button(label="⚡ RE-CALCULATE SYSTEM BIAS")
 
 seller_pct = 100 - input_buyer_pct
 
 # ─── DYNAMIC BIAS INTERPRETATION DISPLAY ──────────────────────────────────
 bias_condition = "BULLISH CHARGED" if input_buyer_pct >= 50 else "BEARISH CHARGED"
 if bias_condition == "BULLISH CHARGED":
-    st.markdown(f'<div class="bias-banner-bullish">📊 CURRENT MARKET BIAS: ORDER FLOW CONVERGENCE → MULTI-TIMEFRAME LONG BIAS ({input_buyer_pct}% BUY SENTIMENT)</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="bias-banner-bullish"> 📈 CURRENT MARKET BIAS: ORDER FLOW CONVERGENCE → MULTI-TIMEFRAME LONG BIAS ({input_buyer_pct}% BUY SENTIMENT)</div>', unsafe_allow_html=True)
 else:
-    st.markdown(f'<div class="bias-banner-bearish">📊 CURRENT MARKET BIAS: LIQUIDITY SWEEP CONVERGENCE → MULTI-TIMEFRAME SHORT BIAS ({seller_pct}% SELL SENTIMENT)</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="bias-banner-bearish"> 📉 CURRENT MARKET BIAS: LIQUIDITY SWEEP CONVERGENCE → MULTI-TIMEFRAME SHORT BIAS ({seller_pct}% SELL SENTIMENT)</div>', unsafe_allow_html=True)
 
 # ─── METRIC DATA ARRAY TILES ──────────────────────────────────────────────
 m_col1, m_col2, m_col3, m_col4 = st.columns(4)
-m_col1.metric(f"Price Status ({feed_origin})", f"${live_mark:,.2f}")
-m_col2.metric("Institutional Liquidity Top", f"${input_liq_high:,.2f}")
-m_col3.metric("Institutional Liquidity Base", f"${input_liq_low:,.2f}")
-m_col4.metric("Net Volume Delta", f"{input_vol_delta:+,}")
+m_col1.metric("Mark Price Entry", f"${input_mark_price:,.2f}")
+m_col2.metric("Liquidity Top Boundary", f"${input_liq_high:,.2f}")
+m_col3.metric("Liquidity Base Boundary", f"${input_liq_low:,.2f}")
+m_col4.metric("Volume Delta Delta", f"{input_vol_delta:+,}")
 
 st.markdown("---")
 
@@ -125,12 +102,11 @@ for idx, tf in enumerate(mtf_tfs):
 st.markdown("---")
 
 # ─── PURE PRICE ACTION PROFILE VISUALIZER ────────────────────────────────
-st.subheader(f"📊 {selected_asset} Order Flow & Sentiment Profile ({exec_tf} Execution View)")
+st.subheader(f"📊 {selected_asset} Order Flow & Sentiment Profile ({exec_tf} View)")
 
 c1, c2 = st.columns(2)
 
 with c1:
-    # Fix: Replaced the broken empty charts with a bulletproof structural range layout
     fig = go.Figure()
     fig.add_trace(go.Bar(
         x=[input_liq_high - input_liq_low], y=[selected_asset],
@@ -139,9 +115,9 @@ with c1:
         hoverinfo='none', showlegend=False
     ))
     fig.add_trace(go.Scatter(
-        x=[live_mark], y=[selected_asset],
+        x=[input_mark_price], y=[selected_asset],
         mode='markers+text', name='Live Mark',
-        text=[f"Live Mark: ${live_mark:,.2f}"], textposition="top center",
+        text=[f"Live Mark: ${input_mark_price:,.2f}"], textposition="top center",
         marker=dict(color='#00ffcc', size=15, symbol='triangle-down')
     ))
     fig.update_layout(
@@ -161,4 +137,4 @@ with c2:
     fig_pie.update_layout(template="plotly_dark", height=200, margin=dict(l=10, r=10, t=10, b=10), showlegend=False)
     st.plotly_chart(fig_pie, use_container_width=True)
 
-st.success("🔒 Cloud System Fully Functional. Open Price Feed Streaming Active.")
+st.success("🔒 System Operational. Type parameters into the sidebar panel and click 'Re-Calculate' to refresh models.")
