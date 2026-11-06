@@ -1,5 +1,5 @@
 # app.py
-# Shark Exchange — PURE INSTITUTIONAL BIAS ENGINE (PHASE 2 - NATIVE DATA)
+# Shark Exchange — PURE INSTITUTIONAL BIAS ENGINE (PHASE 2 - COMPLETED NATIVE DATA)
 # Hosted live on Streamlit Community Cloud
 
 import streamlit as st
@@ -8,6 +8,11 @@ import numpy as np
 import requests
 import plotly.graph_objects as go
 from datetime import datetime
+from streamlit_autorefresh import st_autorefresh
+
+# ─── AUTO REFRESH LOOP NODE ───────────────────────────────────────────────
+# This pings the server automatically every 3 seconds to keep prices live!
+st_autorefresh(interval=3000, key="shark_live_stream_node")
 
 # ─── PREMIUM INSTITUTIONAL DARK THEME CONFIG ──────────────────────────────
 st.set_page_config(page_title="Shark Institutional Bias Engine", page_icon="🦈", layout="wide")
@@ -39,11 +44,11 @@ st.caption("Phase 2 Native Node — 100% Dedicated Live Price Streaming Hub.")
 st.markdown("---")
 
 # ─── NATIVE SHARK API LIVE CONNECTOR ──────────────────────────────────────
-@st.cache_data(ttl=2) # Streams fresh tick data every 2 seconds from the exchange
+@st.cache_data(ttl=1) # Clears cache instantly for active price adjustments
 def fetch_shark_native_price(symbol):
     try:
         url = "https://sharkexchange.in"
-        response = requests.get(url, params={"symbol": symbol}, timeout=3)
+        response = requests.get(url, params={"symbol": symbol}, timeout=2)
         if response.status_code == 200:
             payload = response.json()
             price = float(payload.get("lastPrice", 0))
@@ -52,7 +57,7 @@ def fetch_shark_native_price(symbol):
     except Exception:
         pass
     
-    # Clean baseline return if exchange node is processing high traffic blocks
+    # Clean default return baseline values if network traffic blocks response
     fallback_p = 76480.50 if symbol == "BTCUSDT" else 2684.30
     return fallback_p, "SYNCING"
 
@@ -124,7 +129,7 @@ st.subheader(f"📊 {selected_asset} Order Flow & Sentiment Profile ({exec_tf} E
 c1, c2 = st.columns(2)
 
 with c1:
-    # Liquidity boundary bands visual framework
+    # Safely mapped chart visualization bands
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=[0, 1], y=[input_liq_high, input_liq_high], mode="lines", name="Buy Stop Liquidity Pool", line=dict(color="#ff4444", dash="dash")))
     fig.add_trace(go.Scatter(x=[0.5], y=[live_mark], mode="markers+text", text=[f"Live Mark: ${live_mark:,.2f}"], textposition="top center", marker=dict(color="#00ffcc", size=14), name="Active Mark"))
