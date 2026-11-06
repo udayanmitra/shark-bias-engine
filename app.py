@@ -1,5 +1,5 @@
 # app.py
-# Shark Exchange — PURE INSTITUTIONAL BIAS ENGINE (PHASE 2 - COMPLETED NATIVE DATA)
+# Shark Exchange — PURE INSTITUTIONAL BIAS ENGINE (PHASE 2 - LIVE DATA FIX)
 # Hosted live on Streamlit Community Cloud
 
 import streamlit as st
@@ -7,12 +7,11 @@ import pandas as pd
 import numpy as np
 import requests
 import plotly.graph_objects as go
-from datetime import datetime
 from streamlit_autorefresh import st_autorefresh
 
-# ─── AUTO REFRESH LOOP NODE ───────────────────────────────────────────────
-# This pings the server automatically every 3 seconds to keep prices live!
-st_autorefresh(interval=3000, key="shark_live_stream_node")
+# ─── AUTO REFRESH LOOP ────────────────────────────────────────────────────
+# Tells the cloud server to ping the feed every 3 seconds automatically
+st_autorefresh(interval=3000, key="shark_live_tick_node")
 
 # ─── PREMIUM INSTITUTIONAL DARK THEME CONFIG ──────────────────────────────
 st.set_page_config(page_title="Shark Institutional Bias Engine", page_icon="🦈", layout="wide")
@@ -44,22 +43,21 @@ st.caption("Phase 2 Native Node — 100% Dedicated Live Price Streaming Hub.")
 st.markdown("---")
 
 # ─── NATIVE SHARK API LIVE CONNECTOR ──────────────────────────────────────
-@st.cache_data(ttl=1) # Clears cache instantly for active price adjustments
 def fetch_shark_native_price(symbol):
     try:
+        # Request target pricing from the official public endpoints
         url = "https://sharkexchange.in"
         response = requests.get(url, params={"symbol": symbol}, timeout=2)
         if response.status_code == 200:
             payload = response.json()
+            # If Shark API returns a string dictionary value, extract lastPrice
             price = float(payload.get("lastPrice", 0))
             if price > 0:
-                return price, "LIVE"
-    except Exception:
-        pass
+                return price, "LIVE FEED"
+    except Exception as e:
+        return None, f"CONNECTION ERROR: {str(e)}"
     
-    # Clean default return baseline values if network traffic blocks response
-    fallback_p = 76480.50 if symbol == "BTCUSDT" else 2684.30
-    return fallback_p, "SYNCING"
+    return None, "SYNCING NODE"
 
 # ─── SIDEBAR MANIPULATION MODULES ──────────────────────────────────────────
 st.sidebar.header("🔍 MARKET MATRIX SELECTION")
@@ -82,11 +80,16 @@ st.sidebar.caption("Input your manual SMC metrics below:")
 # Stream Live Price directly from Shark Exchange server node
 live_mark, node_status = fetch_shark_native_price(selected_asset)
 
+# Safeguard logic if the public server api returns a disconnect block
+if live_mark is None or live_mark == 0:
+    st.sidebar.warning(f"⚠️ Exchange Node State: {node_status}. Inputting baseline tracker values.")
+    live_mark = 75709.00 if selected_asset == "BTCUSDT" else 2684.30
+
 # Dynamic Retracement Boundaries centered on live exchange price
 input_liq_high = st.sidebar.number_input("Institutional Liquidity Top ($)", value=float(round(live_mark * 1.002, 2)), step=0.1)
 input_liq_low = st.sidebar.number_input("Institutional Liquidity Base ($)", value=float(round(live_mark * 0.998, 2)), step=0.1)
-input_buyer_pct = st.sidebar.slider("Buyer Sentiment Ratio (%)", min_value=0, max_value=100, value=58)
-input_vol_delta = st.sidebar.number_input("Net Volume Delta (Contracts)", value=4120, step=10)
+input_buyer_pct = st.sidebar.slider("Buyer Sentiment Ratio (%)", min_value=0, max_value=100, value=55)
+input_vol_delta = st.sidebar.number_input("Net Volume Delta (Contracts)", value=3450, step=10)
 
 seller_pct = 100 - input_buyer_pct
 
@@ -129,11 +132,11 @@ st.subheader(f"📊 {selected_asset} Order Flow & Sentiment Profile ({exec_tf} E
 c1, c2 = st.columns(2)
 
 with c1:
-    # Safely mapped chart visualization bands
+    # Completely fixed axis parameters containing zero blank characters
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=[0, 1], y=[input_liq_high, input_liq_high], mode="lines", name="Buy Stop Liquidity Pool", line=dict(color="#ff4444", dash="dash")))
     fig.add_trace(go.Scatter(x=[0.5], y=[live_mark], mode="markers+text", text=[f"Live Mark: ${live_mark:,.2f}"], textposition="top center", marker=dict(color="#00ffcc", size=14), name="Active Mark"))
-    fig.add_trace(go.Scatter(x=[0, 1], y=[input_liq_low, input_liq_low], mode="lines", name="Sell Stop Liquidity Pool", line=dict(color="#00ff88", dash="dash")))
+    fig.add_trace(go.Scatter(x=[0, 1], y=[input_low := input_liq_low, input_low], mode="lines", name="Sell Stop Liquidity Pool", line=dict(color="#00ff88", dash="dash")))
     
     fig.update_layout(template="plotly_dark", height=300, margin=dict(l=20, r=20, t=20, b=20), xaxis=dict(visible=False), yaxis=dict(gridcolor="#1f2e40"))
     st.plotly_chart(fig, use_container_width=True)
