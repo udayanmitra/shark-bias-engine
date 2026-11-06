@@ -35,7 +35,7 @@ div[data-testid="stMetricValue"] { font-size: 1.3rem; font-weight: bold; color: 
 
 st.title("🦈 SHARK EXCHANGE // INSTITUTIONAL BIAS ENGINE")
 st.caption("Phase 1 Production Release — Manual Input Framework. Pure Price Action, SMC & Volume Order Flow Analysis.")
-st.hr()
+st.markdown("---")
 
 # ─── SIDEBAR MANUAL INPUT CONTROL PANEL ───────────────────────────────────
 st.sidebar.header("🔍 MARKET MATRIX SELECTION")
@@ -45,13 +45,13 @@ trading_profile = st.sidebar.radio("Active Operational Profile", ["INTRADAY", "S
 if trading_profile == "INTRADAY":
     exec_tf = "3m"
     mtf_tfs = ["15m", "30m", "1h"]
-    st.sidebar.info("⚡ Profile: INTRADAY\\nExecution Frame: 3m\\nContext Filters: 15m | 30m | 1h")
+    st.sidebar.info("⚡ Profile: INTRADAY\nExecution Frame: 3m\nContext Filters: 15m | 30m | 1h")
 else:
     exec_tf = "30m"
     mtf_tfs = ["1h", "4h", "12h", "1d"]
-    st.sidebar.info("🔱 Profile: SWING\\nExecution Frame: 30m\\nContext Filters: 1h | 4h | 12h | 1d")
+    st.sidebar.info("🔱 Profile: SWING\nExecution Frame: 30m\nContext Filters: 1h | 4h | 12h | 1d")
 
-st.sidebar.hr()
+st.sidebar.markdown("---")
 st.sidebar.header("✍️ MANUAL DATA ENTRY")
 st.sidebar.caption("Type in current values directly from your broker screen:")
 
@@ -79,7 +79,7 @@ m_col2.metric("Institutional Liquidity Top", f"${input_liq_high:,.2f}")
 m_col3.metric("Institutional Liquidity Base", f"${input_liq_low:,.2f}")
 m_col4.metric("Net Volume Delta", f"{input_vol_delta:+,}")
 
-st.hr()
+st.markdown("---")
 
 # ─── MULTI-TIMEFRAME FRAME CONTEXT GRID ───────────────────────────────────
 st.subheader("🎯 Multi-Timeframe (MTF) Market Structure Context Matrix")
@@ -96,12 +96,12 @@ for idx, tf in enumerate(mtf_tfs):
         st.write(f"• **Structural Shift:** {last_action}")
         st.progress(input_buyer_pct / 100.0)
 
-st.hr()
+st.markdown("---")
 
 # ─── PURE PRICE ACTION PROFILE VISUALIZER ────────────────────────────────
 st.subheader(f"📊 {selected_asset} Order Flow & Sentiment Profile ({exec_tf} Execution View)")
 
-c1, c2 = st.columns()
+c1, c2 = st.columns(2)
 
 with c1:
     # Render dynamic layout tracking user values
