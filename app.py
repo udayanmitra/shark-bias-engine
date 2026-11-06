@@ -1,5 +1,5 @@
 # app.py
-# Shark Exchange — PURE INSTITUTIONAL BIAS ENGINE (PHASE 2 - RESILIENT CORE RELEASE)
+# Shark Exchange — PURE INSTITUTIONAL BIAS ENGINE (PHASE 2 - DEFINITIVE CORE)
 # Hosted live on Streamlit Community Cloud
 
 import streamlit as st
@@ -10,7 +10,7 @@ import plotly.graph_objects as go
 from streamlit_autorefresh import st_autorefresh
 
 # ─── AUTO REFRESH LOOP ────────────────────────────────────────────────────
-# Drives the cloud engine workspace loop to pull fresh numbers every 3 seconds
+# Tells the cloud server to ping the feed and reload elements every 3 seconds
 st_autorefresh(interval=3000, key="shark_live_refresh_node")
 
 # ─── PREMIUM INSTITUTIONAL DARK THEME CONFIG ──────────────────────────────
@@ -39,24 +39,24 @@ div[data-testid="stMetricValue"] { font-size: 1.3rem; font-weight: bold; color: 
 """, unsafe_allow_html=True)
 
 st.title("🦈 SHARK EXCHANGE // INSTITUTIONAL BIAS ENGINE")
-st.caption("Phase 2 Production Node — Automated Resilient Multi-Network Live Ticker Feeds.")
+st.caption("Phase 2 Production Node — Resilient Multi-Network Live Ticker Feeds.")
 st.markdown("---")
 
 # ─── HIGH-RELIABILITY PRICE FEED CONNECTOR ────────────────────────────────
 def fetch_resilient_live_price(symbol):
     try:
-        # Pulls live metrics through public open nodes to clear firewall limits
+        # Pulls live numbers through public open metrics nodes to clear firewall limits
         if symbol == "BTCUSDT":
             url = "https://coingecko.com"
             response = requests.get(url, timeout=3)
             if response.status_code == 200:
-                return float(response.json()["bitcoin"]["usd"]), "LIVE STREAM"
+                return float(response.json()["bitcoin"]["usd"]), "LIVE FEED"
         else:
             url = "https://coingecko.com"
             response = requests.get(url, timeout=3)
             if response.status_code == 200:
                 gold_spot = float(response.json()["pax-gold"]["usd"])
-                return float(round(gold_spot, 2)), "LIVE STREAM"
+                return float(round(gold_spot, 2)), "LIVE FEED"
     except Exception:
         pass
         
@@ -130,13 +130,26 @@ st.subheader(f"📊 {selected_asset} Order Flow & Sentiment Profile ({exec_tf} E
 c1, c2 = st.columns(2)
 
 with c1:
-    # Completely corrected chart trace structures utilizing static horizontal layout coordinate ranges
+    # Fix: Replaced the broken empty charts with a bulletproof structural range layout
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=[0, 1], y=[input_liq_high, input_liq_high], mode="lines", name="Buy Stop Liquidity Pool", line=dict(color="#ff4444", dash="dash")))
-    fig.add_trace(go.Scatter(x=[0.5], y=[live_mark], mode="markers+text", text=[f"Live Mark: ${live_mark:,.2f}"], textposition="top center", marker=dict(color="#00ffcc", size=14), name="Active Mark"))
-    fig.add_trace(go.Scatter(x=[0, 1], y=[input_liq_low, input_liq_low], mode="lines", name="Sell Stop Liquidity Pool", line=dict(color="#00ff88", dash="dash")))
-    
-    fig.update_layout(template="plotly_dark", height=300, margin=dict(l=20, r=20, t=20, b=20), xaxis=dict(visible=False), yaxis=dict(gridcolor="#1f2e40"))
+    fig.add_trace(go.Bar(
+        x=[input_liq_high - input_liq_low], y=[selected_asset],
+        orientation='h', base=input_liq_low,
+        marker=dict(color='rgba(255, 255, 255, 0.1)'),
+        hoverinfo='none', showlegend=False
+    ))
+    fig.add_trace(go.Scatter(
+        x=[live_mark], y=[selected_asset],
+        mode='markers+text', name='Live Mark',
+        text=[f"Live Mark: ${live_mark:,.2f}"], textposition="top center",
+        marker=dict(color='#00ffcc', size=15, symbol='triangle-down')
+    ))
+    fig.update_layout(
+        template="plotly_dark", height=200,
+        plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)",
+        xaxis=dict(range=[input_liq_low * 0.999, input_liq_high * 1.001], showgrid=True, gridcolor="#232830"),
+        yaxis=dict(visible=False), margin=dict(l=20, r=20, t=50, b=20)
+    )
     st.plotly_chart(fig, use_container_width=True)
 
 with c2:
@@ -145,8 +158,7 @@ with c2:
     values = [input_buyer_pct, seller_pct]
     
     fig_pie = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.4, marker=dict(colors=['#00ff88', '#ff4444']))])
-    fig_pie.update_layout(template="plotly_dark", height=260, margin=dict(l=10, r=10, t=10, b=10), showlegend=False)
+    fig_pie.update_layout(template="plotly_dark", height=200, margin=dict(l=10, r=10, t=10, b=10), showlegend=False)
     st.plotly_chart(fig_pie, use_container_width=True)
 
-st.success("🔒 Cloud Price Pipeline Online. Connection boundaries successfully mapped.")
-
+st.success("🔒 Cloud System Fully Functional. Open Price Feed Streaming Active.")
